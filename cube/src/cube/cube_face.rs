@@ -1,3 +1,5 @@
+use ansi_term::Colour;
+
 #[derive(Clone, Copy, Debug)]
 pub enum CubeColors {
     Red,
@@ -79,6 +81,19 @@ impl Face {
     pub fn set_face(&mut self, new_face: [[CubeColors; 3]; 3]) {
         self.face_data = new_face;
     }
+    pub fn get_mid_v(&self) -> [CubeColors; 3] {
+        [
+            self.face_data[0][1],
+            self.face_data[1][1],
+            self.face_data[2][1],
+        ]
+    }
+    pub fn set_mid_v(&mut self, new_mid: [CubeColors; 3]) {
+        self.face_data[0][1] = new_mid[0];
+        self.face_data[1][1] = new_mid[1];
+        self.face_data[2][1] = new_mid[2];
+    }
+
     pub fn rotate(&mut self, direction: i8) {
         if direction > 0 {
             let first_element = self.face_data[0][0];
@@ -114,8 +129,20 @@ impl CubeColors {
                     .nth(0)
                     .unwrap_or(' ')
                     .to_string();
-                color
+                self.colorize(color)
             }
+        }
+    }
+
+    fn colorize(&self, item_string: String) -> String {
+        match self {
+            CubeColors::Blue => Colour::Blue.paint(item_string).to_string(),
+            CubeColors::Red => Colour::Red.paint(item_string).to_string(),
+            CubeColors::Yellow => Colour::Yellow.paint(item_string).to_string(),
+            CubeColors::Orange => Colour::RGB(255, 165, 0).paint(item_string).to_string(),
+            CubeColors::Green => Colour::Green.paint(item_string).to_string(),
+            CubeColors::White => Colour::White.paint(item_string).to_string(),
+            CubeColors::None => Colour::Black.paint(item_string).to_string(),
         }
     }
 }
