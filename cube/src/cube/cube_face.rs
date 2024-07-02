@@ -32,12 +32,32 @@ impl Face {
 
         return result;
     }
+    pub fn plain_face_data(&self) -> String {
+        let mut result: String = String::new();
+
+        self.write_plain(&mut result);
+
+        return result;
+    }
     fn write_color(&self, dest: &mut [String; 3], pos_x: usize) {
         let mut result = String::new();
         result += self.face_data[pos_x][0].color().as_str();
         result += self.face_data[pos_x][1].color().as_str();
         result += self.face_data[pos_x][2].color().as_str();
         dest[pos_x] = result;
+    }
+    fn write_plain(&self, dest: &mut String) {
+        let mut result = String::new();
+        result += self.face_data[0][0].plain_color().as_str();
+        result += self.face_data[0][1].plain_color().as_str();
+        result += self.face_data[0][2].plain_color().as_str();
+        result += self.face_data[1][0].plain_color().as_str();
+        result += self.face_data[1][1].plain_color().as_str();
+        result += self.face_data[1][2].plain_color().as_str();
+        result += self.face_data[2][0].plain_color().as_str();
+        result += self.face_data[2][1].plain_color().as_str();
+        result += self.face_data[2][2].plain_color().as_str();
+        dest.push_str(&result);
     }
     pub fn get_up(&self) -> [CubeColors; 3] {
         self.face_data[0]
@@ -93,29 +113,43 @@ impl Face {
         self.face_data[1][1] = new_mid[1];
         self.face_data[2][1] = new_mid[2];
     }
+    pub fn get_mid_h(&self) -> [CubeColors; 3] {
+        self.face_data[1]
+    }
+    pub fn set_mid_h(&mut self, new_mid: [CubeColors; 3]) {
+        self.face_data[1] = new_mid;
+    }
 
     pub fn rotate(&mut self, direction: i8) {
         if direction > 0 {
-            let first_element = self.face_data[0][0];
-            self.face_data[0][0] = self.face_data[1][0];
-            self.face_data[1][0] = self.face_data[2][0];
-            self.face_data[2][0] = self.face_data[2][1];
-            self.face_data[2][1] = self.face_data[2][2];
-            self.face_data[2][2] = self.face_data[1][2];
-            self.face_data[1][2] = self.face_data[0][2];
-            self.face_data[0][2] = self.face_data[0][1];
-            self.face_data[0][1] = first_element;
+            self.rotate_clockwise();
+            self.rotate_clockwise();
         } else {
-            let first_element = self.face_data[0][0];
-            self.face_data[0][0] = self.face_data[0][1];
-            self.face_data[0][1] = self.face_data[0][2];
-            self.face_data[0][2] = self.face_data[1][2];
-            self.face_data[1][2] = self.face_data[2][2];
-            self.face_data[2][2] = self.face_data[2][1];
-            self.face_data[2][1] = self.face_data[2][0];
-            self.face_data[2][0] = self.face_data[1][0];
-            self.face_data[1][0] = first_element;
+            self.rotate_counter_clockwise();
+            self.rotate_counter_clockwise();
         }
+    }
+    fn rotate_clockwise(&mut self) {
+        let first_element = self.face_data[0][0];
+        self.face_data[0][0] = self.face_data[1][0];
+        self.face_data[1][0] = self.face_data[2][0];
+        self.face_data[2][0] = self.face_data[2][1];
+        self.face_data[2][1] = self.face_data[2][2];
+        self.face_data[2][2] = self.face_data[1][2];
+        self.face_data[1][2] = self.face_data[0][2];
+        self.face_data[0][2] = self.face_data[0][1];
+        self.face_data[0][1] = first_element;
+    }
+    fn rotate_counter_clockwise(&mut self) {
+        let first_element = self.face_data[0][0];
+        self.face_data[0][0] = self.face_data[0][1];
+        self.face_data[0][1] = self.face_data[0][2];
+        self.face_data[0][2] = self.face_data[1][2];
+        self.face_data[1][2] = self.face_data[2][2];
+        self.face_data[2][2] = self.face_data[2][1];
+        self.face_data[2][1] = self.face_data[2][0];
+        self.face_data[2][0] = self.face_data[1][0];
+        self.face_data[1][0] = first_element;
     }
 }
 
@@ -130,6 +164,19 @@ impl CubeColors {
                     .unwrap_or(' ')
                     .to_string();
                 self.colorize(color)
+            }
+        }
+    }
+    fn plain_color(&self) -> String {
+        match self {
+            CubeColors::None => " ".to_string(),
+            _ => {
+                let color = format!("{:?}", self)
+                    .chars()
+                    .nth(0)
+                    .unwrap_or(' ')
+                    .to_string();
+                color
             }
         }
     }
