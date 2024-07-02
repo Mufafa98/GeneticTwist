@@ -42,22 +42,154 @@ impl Cube {
                 CubeMoves::Left => self.left(),
                 CubeMoves::Front => self.front(),
                 CubeMoves::Back => self.back(),
-                _ => {
-                    println!("Not a valid move. This should be a bug. Please contact the developer")
-                }
-            },
-            MoveModifier::Big => {}
-            MoveModifier::Double => {}
-            MoveModifier::Prim => {}
-            MoveModifier::Special => match move_to_make {
                 CubeMoves::X => self.x(),
                 CubeMoves::Y => self.y(),
                 CubeMoves::Z => self.z(),
                 CubeMoves::M => self.m(),
                 CubeMoves::E => self.e(),
                 CubeMoves::S => self.s(),
-                _ => {
-                    println!("Not a valid move. This should be a bug. Please contact the developer")
+            },
+            MoveModifier::Big => match move_to_make {
+                CubeMoves::Up => {
+                    self.e();
+                    self.e();
+                    self.e();
+                    self.up();
+                }
+                CubeMoves::Down => {
+                    self.e();
+                    self.down();
+                }
+                CubeMoves::Right => {
+                    self.m();
+                    self.m();
+                    self.m();
+                    self.right();
+                }
+                CubeMoves::Left => {
+                    self.m();
+                    self.left();
+                }
+                CubeMoves::Front => {
+                    self.s();
+                    self.front();
+                }
+                CubeMoves::Back => {
+                    self.s();
+                    self.back();
+                }
+                _ => println!("Unsuported move"),
+            },
+            MoveModifier::Double => match move_to_make {
+                CubeMoves::Up => {
+                    self.up();
+                    self.up()
+                }
+                CubeMoves::Down => {
+                    self.down();
+                    self.down()
+                }
+                CubeMoves::Right => {
+                    self.right();
+                    self.right();
+                }
+                CubeMoves::Left => {
+                    self.left();
+                    self.left();
+                }
+                CubeMoves::Front => {
+                    self.front();
+                    self.front();
+                }
+                CubeMoves::Back => {
+                    self.back();
+                    self.back();
+                }
+                CubeMoves::X => {
+                    self.x();
+                    self.x();
+                }
+                CubeMoves::Y => {
+                    self.y();
+                    self.y();
+                }
+                CubeMoves::Z => {
+                    self.z();
+                    self.z();
+                }
+                CubeMoves::M => {
+                    self.m();
+                    self.m();
+                }
+                CubeMoves::E => {
+                    self.e();
+                    self.e();
+                }
+                CubeMoves::S => {
+                    self.s();
+                    self.s();
+                }
+            },
+            MoveModifier::Prim => match move_to_make {
+                CubeMoves::Up => {
+                    self.up();
+                    self.up();
+                    self.up();
+                }
+                CubeMoves::Down => {
+                    self.down();
+                    self.down();
+                    self.down();
+                }
+                CubeMoves::Right => {
+                    self.right();
+                    self.right();
+                    self.right();
+                }
+                CubeMoves::Left => {
+                    self.left();
+                    self.left();
+                    self.left();
+                }
+                CubeMoves::Front => {
+                    self.front();
+                    self.front();
+                    self.front();
+                }
+                CubeMoves::Back => {
+                    self.back();
+                    self.back();
+                    self.back();
+                }
+                CubeMoves::X => {
+                    self.x();
+                    self.x();
+                    self.x();
+                }
+                CubeMoves::Y => {
+                    self.y();
+                    self.y();
+                    self.y();
+                }
+                CubeMoves::Z => {
+                    self.z();
+                    self.z();
+                    self.z();
+                }
+                CubeMoves::M => {
+                    self.m();
+                    self.m();
+                    self.m();
+                }
+                CubeMoves::E => {
+                    self.e();
+                    self.e();
+                    self.e();
+                }
+                CubeMoves::S => {
+                    self.s();
+                    self.s();
+                    self.s();
                 }
             },
         }
@@ -69,6 +201,7 @@ impl Cube {
         self.cube[3].set_up(self.cube[4].get_up());
         self.cube[4].set_up(up_buffer);
         self.cube[0].rotate(1);
+        self.cube[0].rotate(1);
     }
     fn down(&mut self) {
         let down_buffer = self.cube[4].get_down().clone();
@@ -76,6 +209,7 @@ impl Cube {
         self.cube[3].set_down(self.cube[2].get_down());
         self.cube[2].set_down(self.cube[1].get_down());
         self.cube[1].set_down(down_buffer);
+        self.cube[5].rotate(1);
         self.cube[5].rotate(1);
     }
     fn front(&mut self) {
@@ -108,17 +242,34 @@ impl Cube {
         let right_buffer = self.cube[0].get_right().clone();
         self.cube[0].set_right(self.cube[3].get_right());
         self.cube[3].set_right(self.cube[5].get_right());
-        self.cube[5].set_right(right_buffer);
+        self.cube[5].set_right(self.cube[1].get_left());
+        self.cube[1].set_left(right_buffer);
+        self.cube[4].rotate(1);
         self.cube[4].rotate(1);
     }
     fn left(&mut self) {
         let left_buffer = self.cube[5].get_left().clone();
         self.cube[5].set_left(self.cube[3].get_left());
         self.cube[3].set_left(self.cube[0].get_left());
-        self.cube[0].set_left(left_buffer);
+        self.cube[0].set_left(self.cube[1].get_right());
+        self.cube[1].set_right(left_buffer);
+        self.cube[2].rotate(1);
         self.cube[2].rotate(1);
     }
-    fn x(&mut self) {}
+    fn x(&mut self) {
+        let mut x_buffer = self.cube[0].get_face();
+        self.cube[0].set_face(self.cube[3].get_face());
+        self.cube[3].set_face(self.cube[5].get_face());
+        let mut temp = self.cube[1].get_face();
+        temp.swap(0, 2);
+        self.cube[5].set_face(temp);
+        x_buffer.swap(0, 2);
+        self.cube[1].set_face(x_buffer);
+        self.cube[2].rotate(-1);
+        self.cube[2].rotate(-1);
+        self.cube[4].rotate(1);
+        self.cube[4].rotate(1);
+    }
     fn y(&mut self) {
         let y_buffer = self.cube[1].get_face();
         self.cube[1].set_face(self.cube[2].get_face());
@@ -130,10 +281,56 @@ impl Cube {
         self.cube[5].rotate(-1);
         self.cube[5].rotate(-1);
     }
-    fn z(&mut self) {}
-    fn m(&mut self) {}
-    fn s(&mut self) {}
-    fn e(&mut self) {}
+    fn z(&mut self) {
+        self.cube[1].rotate(-1);
+        self.cube[1].rotate(-1);
+        self.cube[3].rotate(1);
+        self.cube[3].rotate(1);
+
+        self.cube[0].rotate(1);
+        self.cube[0].rotate(1);
+
+        self.cube[4].rotate(1);
+        self.cube[4].rotate(1);
+
+        self.cube[5].rotate(1);
+        self.cube[5].rotate(1);
+
+        self.cube[2].rotate(1);
+        self.cube[2].rotate(1);
+
+        self.cube.swap(0, 4);
+        self.cube.swap(2, 5);
+        self.cube.swap(0, 5);
+    }
+    fn m(&mut self) {
+        let mid_buffer = self.cube[0].get_mid_v();
+        self.cube[0].set_mid_v(self.cube[1].get_mid_v());
+        self.cube[1].set_mid_v(self.cube[5].get_mid_v());
+        self.cube[5].set_mid_v(self.cube[3].get_mid_v());
+        self.cube[3].set_mid_v(mid_buffer);
+    }
+
+    // BUG LA M2 S2 E2
+
+    fn s(&mut self) {
+        self.front();
+        self.front();
+        self.front();
+        self.back();
+        self.back();
+        self.back();
+        self.z();
+    }
+    fn e(&mut self) {
+        self.down();
+        self.down();
+        self.down();
+        self.up();
+        self.y();
+        self.y();
+        self.y();
+    }
     fn generate_line(
         &self,
         first: &String,
