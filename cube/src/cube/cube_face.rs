@@ -93,29 +93,43 @@ impl Face {
         self.face_data[1][1] = new_mid[1];
         self.face_data[2][1] = new_mid[2];
     }
+    pub fn get_mid_h(&self) -> [CubeColors; 3] {
+        self.face_data[1]
+    }
+    pub fn set_mid_h(&mut self, new_mid: [CubeColors; 3]) {
+        self.face_data[1] = new_mid;
+    }
 
     pub fn rotate(&mut self, direction: i8) {
         if direction > 0 {
-            let first_element = self.face_data[0][0];
-            self.face_data[0][0] = self.face_data[1][0];
-            self.face_data[1][0] = self.face_data[2][0];
-            self.face_data[2][0] = self.face_data[2][1];
-            self.face_data[2][1] = self.face_data[2][2];
-            self.face_data[2][2] = self.face_data[1][2];
-            self.face_data[1][2] = self.face_data[0][2];
-            self.face_data[0][2] = self.face_data[0][1];
-            self.face_data[0][1] = first_element;
+            self.rotate_clockwise();
+            self.rotate_clockwise();
         } else {
-            let first_element = self.face_data[0][0];
-            self.face_data[0][0] = self.face_data[0][1];
-            self.face_data[0][1] = self.face_data[0][2];
-            self.face_data[0][2] = self.face_data[1][2];
-            self.face_data[1][2] = self.face_data[2][2];
-            self.face_data[2][2] = self.face_data[2][1];
-            self.face_data[2][1] = self.face_data[2][0];
-            self.face_data[2][0] = self.face_data[1][0];
-            self.face_data[1][0] = first_element;
+            self.rotate_counter_clockwise();
+            self.rotate_counter_clockwise();
         }
+    }
+    fn rotate_clockwise(&mut self) {
+        let first_element = self.face_data[0][0];
+        self.face_data[0][0] = self.face_data[1][0];
+        self.face_data[1][0] = self.face_data[2][0];
+        self.face_data[2][0] = self.face_data[2][1];
+        self.face_data[2][1] = self.face_data[2][2];
+        self.face_data[2][2] = self.face_data[1][2];
+        self.face_data[1][2] = self.face_data[0][2];
+        self.face_data[0][2] = self.face_data[0][1];
+        self.face_data[0][1] = first_element;
+    }
+    fn rotate_counter_clockwise(&mut self) {
+        let first_element = self.face_data[0][0];
+        self.face_data[0][0] = self.face_data[0][1];
+        self.face_data[0][1] = self.face_data[0][2];
+        self.face_data[0][2] = self.face_data[1][2];
+        self.face_data[1][2] = self.face_data[2][2];
+        self.face_data[2][2] = self.face_data[2][1];
+        self.face_data[2][1] = self.face_data[2][0];
+        self.face_data[2][0] = self.face_data[1][0];
+        self.face_data[1][0] = first_element;
     }
 }
 
