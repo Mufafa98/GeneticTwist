@@ -8,7 +8,6 @@ edition = "2021"
 [dependencies]
 ansi_term = "0.12.1"
 curl = "0.4.46"
-headless_chrome = "1.0.10"
 rand ="0.8.5"
 tokio = { version = "1.38.0", features = ["full"] }
 utils ={path = "../utils"}

@@ -14,12 +14,55 @@ pub enum CubeMoves {
     S,
     E,
 }
+#[derive(Debug)]
 pub enum MoveModifier {
     Prim,
     Double,
     Big,
     Normal,
     BigPrim,
+    BigDouble,
+}
+
+impl MoveModifier {
+    pub fn get_random() -> MoveModifier {
+        let possible_moves = vec![
+            MoveModifier::Normal,
+            MoveModifier::Prim,
+            MoveModifier::Double,
+            MoveModifier::Big,
+            MoveModifier::BigDouble,
+            MoveModifier::BigPrim,
+        ];
+        let probability = generate_between(0.0, 1.0);
+        let division: f32 = 100.0 / possible_moves.len() as f32 / 100.0;
+        let mut counter = division.clone();
+        for posibility in possible_moves {
+            if probability < counter {
+                return posibility;
+            }
+            counter += division;
+        }
+        return MoveModifier::Normal;
+    }
+    pub fn short_name(&self) -> String {
+        let name = match self {
+            MoveModifier::Prim => "\'",
+            MoveModifier::Double => "2",
+            MoveModifier::Big => "w",
+            MoveModifier::Normal => "",
+            MoveModifier::BigPrim => "w\'",
+            MoveModifier::BigDouble => "w2",
+        }
+        .to_string();
+        name
+    }
+    pub fn match_special(&self) -> bool {
+        match self {
+            MoveModifier::Big | MoveModifier::BigDouble | MoveModifier::BigPrim => false,
+            _ => true,
+        }
+    }
 }
 
 impl CubeMoves {
@@ -56,6 +99,17 @@ impl CubeMoves {
             .unwrap_or(' ')
             .to_string();
         name
+    }
+    pub fn is_special(&self) -> bool {
+        match self {
+            CubeMoves::E
+            | CubeMoves::M
+            | CubeMoves::S
+            | CubeMoves::X
+            | CubeMoves::Z
+            | CubeMoves::Y => true,
+            _ => false,
+        }
     }
 }
 
@@ -113,6 +167,8 @@ pub fn decode_moves(move_to_decode: &str) -> Option<(CubeMoves, MoveModifier)> {
     if wide_move {
         if move_to_decode.chars().nth(1).unwrap_or(' ') == '\'' {
             modifier_found = MoveModifier::BigPrim
+        } else if move_to_decode.chars().nth(1).unwrap_or(' ') == '2' {
+            modifier_found = MoveModifier::BigDouble
         } else {
             modifier_found = MoveModifier::Big
         }

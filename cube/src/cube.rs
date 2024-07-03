@@ -24,26 +24,73 @@ impl Cube {
             ],
         }
     }
-    pub fn shuffle(&self, size: usize) {
+
+    fn generate_shuffle(size: usize) -> Vec<(CubeMoves, MoveModifier)> {
         let mut len = size.clone();
-        print!("Generated moves: ");
+        let mut moves: Vec<(CubeMoves, MoveModifier)> = Vec::new();
         while len > 0 {
-            print!("{} ", CubeMoves::get_random().short_name());
+            let generated_move = CubeMoves::get_random();
+            moves.push((generated_move, MoveModifier::Normal));
             len -= 1;
         }
-        todo!();
+        for (current_move, modifier) in moves.iter_mut() {
+            let mut new_modifier = MoveModifier::get_random();
+            while current_move.is_special() && !new_modifier.match_special() {
+                new_modifier = MoveModifier::get_random();
+            }
+            *modifier = new_modifier;
+        }
+        moves
+    }
+    pub fn shuffle(&mut self, size: usize) {
+        let shuffle = Cube::generate_shuffle(size);
+        for (move_to_make, modifier) in shuffle {
+            self.make_move(move_to_make, modifier);
+        }
     }
     pub fn parse_string_move(&mut self, moves: Vec<String>) {
         for move_string in moves {
             self.make_move_string(move_string.as_str());
         }
     }
+    fn reset(&mut self) {
+        self.cube = [
+            Face::from(CubeColors::Yellow),
+            Face::from(CubeColors::Orange),
+            Face::from(CubeColors::Blue),
+            Face::from(CubeColors::Red),
+            Face::from(CubeColors::Green),
+            Face::from(CubeColors::White),
+        ];
+    }
     pub fn make_move_string(&mut self, move_string: &str) {
         let move_data = decode_moves(move_string);
         if let Some((data, modifier)) = move_data {
             self.make_move(data, modifier);
         } else {
-            println!("The move {} was not recognized. Try again", move_string);
+            let tokens: Vec<String> = move_string
+                .split("+")
+                .map(|token| token.to_string())
+                .collect();
+            if let Some(command) = tokens.get(0) {
+                if command == "!shuffle" {
+                    if let Some(no_moves_string) = tokens.get(1) {
+                        if let Ok(number) = no_moves_string.parse() {
+                            self.shuffle(number)
+                        } else {
+                            println!("Invalid number format")
+                        }
+                    } else {
+                        println!("Invalid number of moves\n Shuffle format is: !shuffle+<number>");
+                    }
+                } else if command == "!reset" {
+                    self.reset();
+                } else {
+                    println!("The move {} was not recognized. Try again", move_string);
+                }
+            } else {
+                println!("No command recived");
+            }
         }
     }
     pub fn make_move(&mut self, move_to_make: CubeMoves, modifier: MoveModifier) {
@@ -91,7 +138,11 @@ impl Cube {
                     self.s();
                     self.back();
                 }
-                _ => println!("Unsuported move"),
+                _ => println!(
+                    "Unsuported move combination {} {}",
+                    move_to_make.short_name(),
+                    modifier.short_name()
+                ),
             },
             MoveModifier::BigPrim => match move_to_make {
                 CubeMoves::Up => {
@@ -166,7 +217,63 @@ impl Cube {
                     self.s();
                     self.back();
                 }
-                _ => println!("Unsuported move"),
+                _ => println!(
+                    "Unsuported move combination {} {}",
+                    move_to_make.short_name(),
+                    modifier.short_name()
+                ),
+            },
+            MoveModifier::BigDouble => match move_to_make {
+                CubeMoves::Up => {
+                    self.e();
+                    self.e();
+                    self.e();
+                    self.up();
+
+                    self.e();
+                    self.e();
+                    self.e();
+                    self.up();
+                }
+                CubeMoves::Down => {
+                    self.e();
+                    self.down();
+                    self.e();
+                    self.down();
+                }
+                CubeMoves::Right => {
+                    self.m();
+                    self.m();
+                    self.m();
+                    self.right();
+                    self.m();
+                    self.m();
+                    self.m();
+                    self.right();
+                }
+                CubeMoves::Left => {
+                    self.m();
+                    self.left();
+                    self.m();
+                    self.left();
+                }
+                CubeMoves::Front => {
+                    self.s();
+                    self.front();
+                    self.s();
+                    self.front();
+                }
+                CubeMoves::Back => {
+                    self.s();
+                    self.back();
+                    self.s();
+                    self.back();
+                }
+                _ => println!(
+                    "Unsuported move combination {} {}",
+                    move_to_make.short_name(),
+                    modifier.short_name()
+                ),
             },
             MoveModifier::Double => match move_to_make {
                 CubeMoves::Up => {
@@ -312,29 +419,6 @@ impl Cube {
         result += &self.generate_line(&first[1], &second[1], &third[1], &fourth[1]);
         result += &self.generate_line(&first[2], &second[2], &third[2], &fourth[2]);
         return result;
-    }
-    pub fn format_for_url(&self) -> String {
-        // TO DO maybe add restriction for url
-        let mut result = String::new();
-        result += &self.cube[0].plain_face_data();
-        result += &self.cube[2].plain_face_data();
-        result += &self.cube[3].plain_face_data();
-        result += &self.cube[4].plain_face_data();
-        result += &self.cube[1].plain_face_data();
-        result += &self.cube[5].plain_face_data();
-
-        result = result.replace("Y", "6");
-        result = result.replace("O", "2");
-        result = result.replace("B", "5");
-        result = result.replace("R", "4");
-        result = result.replace("G", "3");
-        result = result.replace("W", "1");
-        result
-    }
-
-    pub fn get_online_solution(&self, url: &String) -> String {
-        todo!();
-        String::new()
     }
 }
 
